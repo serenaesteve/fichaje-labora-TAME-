@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if ($reg && $reg['hora_entrada']) {
             echo json_encode(['ok'=>false,'msg'=>'Ya tienes entrada registrada a las '.substr($reg['hora_entrada'],0,5)]);
         } else {
-            $db->prepare("INSERT INTO Asistencia(empleado_id,fecha,hora_entrada) VALUES(?,?,?) ON DUPLICATE KEY UPDATE hora_entrada=?")->execute([$empId,$today,$nowTime,$nowTime]);
+            $db->prepare("INSERT INTO Asistencia(empleado_id,fecha,hora_entrada) VALUES(?,?,?) ON CONFLICT(empleado_id,fecha) DO UPDATE SET hora_entrada=excluded.hora_entrada")->execute([$empId,$today,$nowTime]);
             echo json_encode(['ok'=>true,'msg'=>'✓ Entrada registrada a las '.substr($nowTime,0,5)]);
         }
         exit;
